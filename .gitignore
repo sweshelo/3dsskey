@@ -1,0 +1,11 @@
+*.3dsx
+*.elf
+*.smdh
+*.wav
+*.icn
+*.png
+*.bnr
+
+build/
+
+source/include/json.hpp
