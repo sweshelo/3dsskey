@@ -1,9 +1,11 @@
 #include <3ds.h>
 #include <string>
 #include <cstring>
+#include <array>
 #include <curl/curl.h>
 #include <iostream>
 #include <malloc.h>
+
 #include "json.hpp"
 
 #define FILE_ALLOC_SIZE 0x60000
@@ -26,32 +28,33 @@ size_t buffer_writer(char *ptr, size_t size, size_t nmemb, void *userdata) {
   return size * nmemb;
 }
 
-json httpGet(const std::string &url) {
-  Result retcode = 0;
-  std::string response;
+json httpGet(const std::string &url, const json &body) {
+  std::string response, request = body.dump(0);
   int res;
-
-  printf("Downloading from:\n%s\n", url.c_str());
 
   void *socubuf = memalign(0x1000, 0x100000);
   if (!socubuf) {
-    retcode = -1;
-    return "";
+      return json({"error", "memalign error"});
   }
 
   res = socInit((u32 *)socubuf, 0x100000);
   if (R_FAILED(res)) {
-    retcode = res;
-    return "";
+    return json({"error", "socInit error"});
   }
+
+  struct curl_slist *headers = NULL;
+  headers = curl_slist_append(headers, "Content-Type: application/json");
+  headers = curl_slist_append(headers, "Accept: application/json");
 
   CurlHandle = curl_easy_init();
   curl_easy_setopt(CurlHandle, CURLOPT_BUFFERSIZE, FILE_ALLOC_SIZE);
   curl_easy_setopt(CurlHandle, CURLOPT_URL, url.c_str());
+  curl_easy_setopt(CurlHandle, CURLOPT_HTTPHEADER, headers);
+  curl_easy_setopt(CurlHandle, CURLOPT_POST, 1L);
+  curl_easy_setopt(CurlHandle, CURLOPT_POSTFIELDS, request.c_str());
   curl_easy_setopt(CurlHandle, CURLOPT_NOPROGRESS, 0L);
   curl_easy_setopt(CurlHandle, CURLOPT_USERAGENT, USER_AGENT);
   curl_easy_setopt(CurlHandle, CURLOPT_FOLLOWLOCATION, 1L);
-  curl_easy_setopt(CurlHandle, CURLOPT_FAILONERROR, 1L);
   curl_easy_setopt(CurlHandle, CURLOPT_ACCEPT_ENCODING, "gzip");
   curl_easy_setopt(CurlHandle, CURLOPT_MAXREDIRS, 50L);
   curl_easy_setopt(CurlHandle, CURLOPT_XFERINFOFUNCTION, curlProgress);
@@ -67,13 +70,18 @@ json httpGet(const std::string &url) {
   CurlHandle = nullptr;
 
   if (curlResult != CURLE_OK) {
-    retcode = -curlResult;
+    return json::parse(response);
   }
 
   if (socubuf) free(socubuf);
   socExit();
 
-  return json::parse(response);
+  if (response != ""){
+    return json::parse(response);
+  }else{
+    return json::object();
+  }
+
 }
 
 int main(int argc, char **argv)
@@ -81,12 +89,15 @@ int main(int argc, char **argv)
   gfxInitDefault();
   consoleInit(GFX_TOP, NULL);
 
-  json res;
-  res = httpGet("http://192.168.1.5/api/misskey?json=true");
+  json res, req = {
+    {"visibility", "home"},
+    {"text", input},
+    {"localOnly", false},
+    {"i", ""},
+  };
 
-  for(int i=0; i<5; i++){
-    std::cout << res[i]["id"] << "[" << res[i]["user"]["name"] << "]: " << res[i]["text"] << std::endl;
-  }
+  res = httpGet("https://misskey.neos.love/api/notes/create", req);
+  std::cout << "res: " << res << std::endl;
 
   while (aptMainLoop())
   {

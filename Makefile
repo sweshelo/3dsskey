@@ -41,7 +41,7 @@ GFXBUILD	:=	$(BUILD)
 #ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)/gfx
 
-APP_TITLE	=	3DSSKEY
+APP_TITLE	=	3dsskey
 APP_DESCRIPTION	=	Misskey client for Nintendo 3DS
 APP_AUTHOR	=	Sweshelo
 ICON	=	app/neos-resized.png

@@ -1,3 +1,3 @@
-# template
+# 3dsskey
 
-This is a template for starting new 3DS libctru projects.
+Misskey client for Nintendo 3DS
