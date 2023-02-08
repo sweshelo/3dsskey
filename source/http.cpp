@@ -50,14 +50,9 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEFUNCTION, this->buffer_writer);
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEDATA, &response);
 
-  this->result = curl_easy_perform(CurlHandle);
+  result = curl_easy_perform(CurlHandle);
   curl_easy_cleanup(CurlHandle);
   CurlHandle = nullptr;
-
-  curl_easy_getinfo(CurlHandle, CURLINFO_RESPONSE_CODE, &(this->httpCode));
-  if (this->result != CURLE_OK) {
-    return json::parse(response);
-  }
 
   if (socubuf) free(socubuf);
   socExit();

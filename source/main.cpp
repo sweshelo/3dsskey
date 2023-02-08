@@ -99,8 +99,7 @@ int main(int argc, char **argv)
 
   mkdir("sdmc:/3ds/3dsskey", 0777);
   std::ifstream f("sdmc:/3ds/3dsskey/config.json");
-  std::string token = "";
-  std::string uuid = "";
+  std::string token, uuid, loginstate;
 
   if(!f){
     uuid = genUuid();
@@ -109,24 +108,28 @@ int main(int argc, char **argv)
     printQr(qr0, top);
 
     res = http.post("https://" + MISSKEY_DOMAIN + "/api/miauth/" + uuid + "/check", NULL);
-    if ( http.result == CURLE_OK ){
+    if (res.contains("token")){
       token = res["token"];
       std::ofstream ofstr("sdmc:/3ds/3dsskey/config.json", std::ios::out | std::ios::binary | std::ios_base::trunc);
       if(!ofstr){
         std::cout << "Error!: cannot open file" << std::endl;
       }
       ofstr.write( res.dump(2).c_str(), res.dump(2).size() );
+      loginstate = "ログインに成功しました";
+    }else{
+      loginstate = "ログインに失敗しました";
     }
   }else{
     json data = json::parse(f);
     token = data["token"];
+    loginstate = "ログインに成功しました";
   }
 
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
   C2D_SceneBegin(top);
   C2D_TextBuf gTextBuf = C2D_TextBufNew(4096);
   C2D_Text gText;
-  C2D_TextParse(&gText, gTextBuf, "ログインしました");
+  C2D_TextParse(&gText, gTextBuf, loginstate.c_str());
   C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
   C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, springgreen, greenyellow, greenyellow, springgreen);
   C2D_DrawText(&gText, C2D_AlignCenter, 200.0f, 120, 0.5f, 0.6f, 0.6f);
