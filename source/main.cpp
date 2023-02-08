@@ -5,6 +5,7 @@
 #include <fstream>
 #include <random>
 #include <citro2d.h>
+#include <dirent.h>
 
 #include "http.hpp"
 #include "json.hpp"
@@ -69,7 +70,7 @@ static void printQr(const QrCode &qr, C3D_RenderTarget* screen) {
 
     //Draw Info
     for(int i=0; i<3; i++)
-      C2D_DrawText(&gText[i], C2D_AlignCenter, 200.0f, 200.0f + 12.0f * i, 0.5f, 0.4f, 0.4f);
+      C2D_DrawText(&gText[i], C2D_AlignCenter, 200.0f, 202.0f + 12.0f * i, 0.5f, 0.4f, 0.4f);
 
     //HID
     hidScanInput();
@@ -96,6 +97,7 @@ int main(int argc, char **argv)
   HTTP http;
   json res, req;
 
+  mkdir("sdmc:/3ds/3dsskey", 0777);
   std::ifstream f("sdmc:/3ds/3dsskey/config.json");
   std::string token = "";
   std::string uuid = "";
@@ -107,10 +109,13 @@ int main(int argc, char **argv)
     printQr(qr0, top);
 
     res = http.post("https://" + MISSKEY_DOMAIN + "/api/miauth/" + uuid + "/check", NULL);
-    if ( http.httpCode == 200 ){
+    if ( http.result == CURLE_OK ){
       token = res["token"];
-    }else{
-      std::cout << res.dump(2) << std::endl;
+      std::ofstream ofstr("sdmc:/3ds/3dsskey/config.json", std::ios::out | std::ios::binary | std::ios_base::trunc);
+      if(!ofstr){
+        std::cout << "Error!: cannot open file" << std::endl;
+      }
+      ofstr.write( res.dump(2).c_str(), res.dump(2).size() );
     }
   }else{
     json data = json::parse(f);
@@ -124,8 +129,8 @@ int main(int argc, char **argv)
     {"i", token},
   };
 
-  if(token != "")
-    res = http.post("https://misskey.neos.love/api/notes/create", req);
+  //if(token != "")
+  //  res = http.post("https://misskey.neos.love/api/notes/create", req);
 
   while (aptMainLoop())
   {

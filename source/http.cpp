@@ -50,12 +50,12 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEFUNCTION, this->buffer_writer);
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEDATA, &response);
 
-  CURLcode curlResult = curl_easy_perform(CurlHandle);
+  this->result = curl_easy_perform(CurlHandle);
   curl_easy_cleanup(CurlHandle);
   CurlHandle = nullptr;
 
   curl_easy_getinfo(CurlHandle, CURLINFO_RESPONSE_CODE, &(this->httpCode));
-  if (curlResult != CURLE_OK) {
+  if (this->result != CURLE_OK) {
     return json::parse(response);
   }
 

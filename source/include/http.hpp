@@ -20,6 +20,7 @@ class HTTP
   public:
     json post(const std::string&, const json&);
     long httpCode;
+    CURLcode result;
 };
 
 #endif
