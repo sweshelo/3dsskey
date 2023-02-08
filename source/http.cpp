@@ -45,7 +45,7 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_setopt(CurlHandle, CURLOPT_XFERINFOFUNCTION, this->curlProgress);
   curl_easy_setopt(CurlHandle, CURLOPT_HTTP_VERSION, (long)CURL_HTTP_VERSION_2TLS);
   curl_easy_setopt(CurlHandle, CURLOPT_SSL_VERIFYPEER, 0L);
-  curl_easy_setopt(CurlHandle, CURLOPT_VERBOSE, 1L);
+  //curl_easy_setopt(CurlHandle, CURLOPT_VERBOSE, 1L);
   curl_easy_setopt(CurlHandle, CURLOPT_STDERR, stdout);
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEFUNCTION, this->buffer_writer);
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEDATA, &response);
@@ -54,6 +54,7 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_cleanup(CurlHandle);
   CurlHandle = nullptr;
 
+  curl_easy_getinfo(CurlHandle, CURLINFO_RESPONSE_CODE, &(this->httpCode));
   if (curlResult != CURLE_OK) {
     return json::parse(response);
   }

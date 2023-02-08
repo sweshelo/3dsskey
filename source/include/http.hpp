@@ -19,6 +19,7 @@ class HTTP
     static size_t buffer_writer(char*, size_t, size_t, void*);
   public:
     json post(const std::string&, const json&);
+    long httpCode;
 };
 
 #endif
