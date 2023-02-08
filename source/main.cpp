@@ -17,6 +17,10 @@
 using namespace qrcodegen;
 
 const std::string MISSKEY_DOMAIN = "misskey.neos.love";
+const u32 springgreen = C2D_Color32(0x00, 0xFF, 0x7F, 0xFF);
+const u32 greenyellow = C2D_Color32(0xAD, 0xFF, 0x2F, 0xFF);
+const u32 black = C2D_Color32(0x00, 0x00, 0x00, 0xFF);
+const u32 white = C2D_Color32(0xFF, 0xFF, 0xFF, 0xFF);
 
 std::string genUuid(){
   std::random_device rd;
@@ -37,10 +41,6 @@ std::string genUuid(){
 
 // Prints the given QrCode object to the console.
 static void printQr(const QrCode &qr, C3D_RenderTarget* screen) {
-  u32 springgreen = C2D_Color32(0x00, 0xFF, 0x7F, 0xFF);
-  u32 greenyellow = C2D_Color32(0xAD, 0xFF, 0x2F, 0xFF);
-  u32 black = C2D_Color32(0x00, 0x00, 0x00, 0xFF);
-  u32 white = C2D_Color32(0xFF, 0xFF, 0xFF, 0xFF);
   int border = 4;
   int marginX = (100 - qr.getSize() - border*2) / 2;
   int marginY = 1;
@@ -121,6 +121,16 @@ int main(int argc, char **argv)
     json data = json::parse(f);
     token = data["token"];
   }
+
+  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  C2D_SceneBegin(top);
+  C2D_TextBuf gTextBuf = C2D_TextBufNew(4096);
+  C2D_Text gText;
+  C2D_TextParse(&gText, gTextBuf, "ログインしました");
+  C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
+  C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, springgreen, greenyellow, greenyellow, springgreen);
+  C2D_DrawText(&gText, C2D_AlignCenter, 200.0f, 120, 0.5f, 0.6f, 0.6f);
+  C3D_FrameEnd(0);
 
   req = {
     {"visibility", "home"},
