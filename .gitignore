@@ -8,4 +8,7 @@
 
 build/
 
+# 外部ライブラリ
 source/include/json.hpp
+source/qrcodegen.cpp
+source/include/qrcodegen.hpp

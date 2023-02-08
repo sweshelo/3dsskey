@@ -41,7 +41,7 @@ GFXBUILD	:=	$(BUILD)
 #ROMFS		:=	romfs
 #GFXBUILD	:=	$(ROMFS)/gfx
 
-APP_TITLE	=	3DSSKEY
+APP_TITLE	=	3dsskey
 APP_DESCRIPTION	=	Misskey client for Nintendo 3DS
 APP_AUTHOR	=	Sweshelo
 ICON	=	app/neos-resized.png
@@ -57,7 +57,7 @@ CFLAGS	:=	-g -Wall -O2 -mword-relocations \
 
 CFLAGS	+=	$(INCLUDE) -DARM11 -D__3DS__
 
-CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions -std=gnu++11
+CXXFLAGS	:= $(CFLAGS) -fno-rtti -std=gnu++11
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=3dsx.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
