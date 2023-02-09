@@ -1,10 +1,7 @@
 *.3dsx
 *.elf
 *.smdh
-*.wav
-*.icn
-*.png
-*.bnr
+*.cia
 
 build/
 

@@ -44,7 +44,13 @@ GFXBUILD	:=	$(BUILD)
 APP_TITLE	=	3dsskey
 APP_DESCRIPTION	=	Misskey client for Nintendo 3DS
 APP_AUTHOR	=	Sweshelo
-ICON	=	app/neos-resized.png
+ICON	=	app/icon.png
+BANNER_AUDIO        :=	app/audio.wav
+BANNER_IMAGE        :=	app/banner.png
+RSF_PATH            :=	app/app.rsf
+VERSION_MAJOR       :=	0
+VERSION_MINOR       :=	0
+VERSION_BUILD       :=	1
 
 #---------------------------------------------------------------------------------
 # options for code generation
@@ -154,7 +160,7 @@ ifeq ($(strip $(ICON)),)
 		endif
 	endif
 else
-	export APP_ICON := $(TOPDIR)/$(ICON)
+	export APP_ICON := $(ICON)
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
@@ -166,6 +172,35 @@ ifneq ($(ROMFS),)
 endif
 
 .PHONY: all clean
+#---------------------------------------------------------------------------------
+MAKEROM		?=	makerom
+
+MAKEROM_ARGS		:=	-elf "$(OUTPUT).elf" -rsf "$(RSF_PATH)" -banner "$(BUILD)/banner.bnr" -icon "$(BUILD)/icon.icn"
+
+ifeq ($(strip $(NOGIT)),)
+    MAKEROM_ARGS    +=  -major $(VERSION_MAJOR) -minor $(VERSION_MINOR) -micro $(VERSION_BUILD)
+endif
+
+ifneq ($(strip $(LOGO)),)
+	MAKEROM_ARGS	+=	 -logo "$(LOGO)"
+endif
+ifneq ($(strip $(ROMFS)),)
+	MAKEROM_ARGS	+=	 -DAPP_ROMFS="$(ROMFS)"
+endif
+
+BANNERTOOL	?=	bannertool
+
+ifeq ($(suffix $(BANNER_IMAGE)),.cgfx)
+	BANNER_IMAGE_ARG := -ci
+else
+	BANNER_IMAGE_ARG := -i
+endif
+
+ifeq ($(suffix $(BANNER_AUDIO)),.cwav)
+	BANNER_AUDIO_ARG := -ca
+else
+	BANNER_AUDIO_ARG := -a
+endif
 
 #---------------------------------------------------------------------------------
 all: $(BUILD) $(GFXBUILD) $(DEPSDIR) $(ROMFS_T3XFILES) $(T3XHFILES)
@@ -188,6 +223,16 @@ endif
 clean:
 	@echo clean ...
 	@rm -fr $(BUILD) $(TARGET).3dsx $(OUTPUT).smdh $(TARGET).elf $(GFXBUILD)
+
+#---------------------------------------------------------------------------------
+cia:
+	@mkdir -p $(BUILD) $(GFXBUILD) $(OUTDIR)
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
+	@$(BANNERTOOL) makebanner $(BANNER_IMAGE_ARG) "$(BANNER_IMAGE)" $(BANNER_AUDIO_ARG) "$(BANNER_AUDIO)" -o "$(BUILD)/banner.bnr"
+	@$(BANNERTOOL) makesmdh -s "$(APP_TITLE)" -l "$(APP_DESCRIPTION)" -p "$(APP_AUTHOR)" -i "$(APP_ICON)" -o "$(BUILD)/icon.icn"
+	$(MAKEROM) -f cia -o "$(OUTPUT).cia" -target t -exefslogo $(MAKEROM_ARGS)
+#---------------------------------------------------------------------------------
+
 
 #---------------------------------------------------------------------------------
 $(GFXBUILD)/%.t3x	$(BUILD)/%.h	:	%.t3s
