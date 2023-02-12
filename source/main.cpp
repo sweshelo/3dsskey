@@ -6,17 +6,18 @@
 #include <random>
 #include <citro2d.h>
 #include <dirent.h>
+#include <initializer_list>
 
 #include "http.hpp"
 #include "json.hpp"
 #include "qrcodegen.hpp"
+#include "Keyboard.hpp"
 
 #define SCREEN_WIDTH  400
 #define SCREEN_HEIGHT 240
 
 using namespace qrcodegen;
 
-const std::string MISSKEY_DOMAIN = "misskey.neos.love";
 const u32 springgreen = C2D_Color32(0x00, 0xFF, 0x7F, 0xFF);
 const u32 greenyellow = C2D_Color32(0xAD, 0xFF, 0x2F, 0xFF);
 const u32 black = C2D_Color32(0x00, 0x00, 0x00, 0xFF);
@@ -41,45 +42,42 @@ std::string genUuid(){
 
 // Prints the given QrCode object to the console.
 static void printQr(const QrCode &qr, C3D_RenderTarget* screen) {
-  int border = 4;
-  int marginX = (100 - qr.getSize() - border*2) / 2;
-  int marginY = 1;
+  int pixel = 2;
+  int border = 3;
+  int marginX = (400/pixel - qr.getSize() - border*2) / 2;
+  int marginY = 15;
 
   C2D_TextBuf gTextBuf = C2D_TextBufNew(4096);
-  C2D_Text gText[3];
-  C2D_TextParse(&gText[0], gTextBuf, "ログイン情報が見つかりません");
-  C2D_TextParse(&gText[1], gTextBuf, "QRコードをスキャンしてログインしてください");
-  C2D_TextParse(&gText[2], gTextBuf, "完了したらボタンを押して続行します");
+  C2D_Text gText[2];
+  C2D_TextParse(&gText[0], gTextBuf, "QRコードをスキャンしてログインしてください");
+  C2D_TextParse(&gText[1], gTextBuf, "完了したらボタンを押して続行します");
 
   for(int i=0; i<3; i++)
     C2D_TextOptimize(&gText[i]);
 
-  while(aptMainLoop()){
-    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
-    C2D_SceneBegin(screen);
-    C2D_TargetClear(screen, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
-    C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, springgreen, greenyellow, greenyellow, springgreen);
+  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  C2D_SceneBegin(screen);
+  C2D_TargetClear(screen, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
+  C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, springgreen, greenyellow, greenyellow, springgreen);
 
-    //Draw QrCode
-    for (int y = -border; y < qr.getSize() + border; y++) {
-      for (int x = -border; x < qr.getSize() + border; x++) {
-        u32 color = qr.getModule(x,y) ? black : white;
-        C2D_DrawRectangle((border+x+marginX)*4 , (border+y+marginY)*4, 0, 4, 4, color, color, color, color);
-      }
+  //Draw QrCode
+  for (int y = -border; y < qr.getSize() + border; y++) {
+    for (int x = -border; x < qr.getSize() + border; x++) {
+      u32 color = qr.getModule(x,y) ? black : white;
+      C2D_DrawRectangle((border+x+marginX)*pixel , (border+y+marginY)*pixel, 0, pixel, pixel, color, color, color, color);
     }
+  }
 
-    //Draw Info
-    for(int i=0; i<3; i++)
-      C2D_DrawText(&gText[i], C2D_AlignCenter, 200.0f, 202.0f + 12.0f * i, 0.5f, 0.4f, 0.4f);
+  //Draw Info
+  for(int i=0; i<3; i++)
+    C2D_DrawText(&gText[i], C2D_AlignCenter, 200.0f, 180.0f + 12.0f * i, 0.5f, 0.5f, 0.5f);
 
+  C3D_FrameEnd(0);
+  while(aptMainLoop()){
     //HID
     hidScanInput();
     if(hidKeysDown() & KEY_A)
       break;
-
-    gfxFlushBuffers();
-    gfxSwapBuffers();
-    C3D_FrameEnd(0);
   }
 }
 
@@ -93,15 +91,44 @@ int main(int argc, char **argv)
 
   // Create screens
   C3D_RenderTarget* top = C2D_CreateScreenTarget(GFX_TOP, GFX_LEFT);
+  C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+  C2D_SceneBegin(top);
+  C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
+  C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, springgreen, greenyellow, greenyellow, springgreen);
 
   HTTP http;
   json res, req;
+  std::string MISSKEY_DOMAIN = "";
 
   mkdir("sdmc:/3ds/3dsskey", 0777);
   std::ifstream f("sdmc:/3ds/3dsskey/config.json");
   std::string token, uuid, loginstate;
 
   if(!f){
+    C2D_TextBuf gTextBuf = C2D_TextBufNew(4096);
+    C2D_Text gText;
+    C2D_TextParse(&gText, gTextBuf, "ログインするサーバのドメインを指定してください");
+    C2D_DrawText(&gText, C2D_AlignCenter | C2D_AtBaseline, 200.0f, 120.0f, 0.5f, 0.5f, 0.5f);
+    C3D_FrameEnd(0);
+
+    Keyboard kbd;
+    kbd.setHintText("misskey.io");
+    kbd.setDictionary({
+        "misskey.io",
+        "misskey.cf",
+        "sushi.ski",
+        "newskey.cc",
+        "misskey.neos.love"
+    });
+    MISSKEY_DOMAIN = kbd.input();
+    std::cout << "BACKED" << std::endl;
+
+    if(MISSKEY_DOMAIN == ""){
+      return -1;
+    }else{
+      std::cout << "return: " << MISSKEY_DOMAIN << std::endl;
+    }
+
     uuid = genUuid();
     std::string authUri = "https://" + MISSKEY_DOMAIN + "/miauth/" + uuid + "?name=3dsskey&permission=write:notes";
     QrCode qr0 = QrCode::encodeText(authUri.c_str(), QrCode::Ecc::MEDIUM);
