@@ -75,7 +75,7 @@ LIBS	:= -lcurl -lcitro2d -lcitro3d -lm -ljansson -lmbedtls -lmbedx509 -lmbedcryp
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(CTRULIB) $(DEVKITPRO)/portlibs/3ds/
+LIBDIRS	:= $(CTRULIB) $(PORTLIBS)
 
 
 
@@ -160,7 +160,7 @@ ifeq ($(strip $(ICON)),)
 		endif
 	endif
 else
-	export APP_ICON := $(ICON)
+	export APP_ICON := $(TOPDIR)/$(ICON)
 endif
 
 ifeq ($(strip $(NO_SMDH)),)
