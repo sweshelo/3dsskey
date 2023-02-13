@@ -1,3 +1,6 @@
+#ifndef __THREEDSSKEY_KEYBOARD_HPP_
+#define __THREEDSSKEY_KEYBOARD_HPP_
+
 #include <3ds.h>
 #include <string>
 #include <vector>
@@ -20,3 +23,4 @@ class Keyboard{
     void setDictionary(std::initializer_list<std::string>);
 };
 
+#endif
