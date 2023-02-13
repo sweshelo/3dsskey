@@ -1,5 +1,5 @@
 BasicInfo:
-  Title                   : "3DSSKEY"
+  Title                   : "3dsskey"
   CompanyCode             : "00"
   ProductCode             : "CTR-S-MISK"
   ContentType             : Application
@@ -7,7 +7,7 @@ BasicInfo:
 
 RomFs:
   # Specifies the root path of the read only file system to include in the ROM.
-  RootPath                : "source"
+  RootPath                : #"source"
   
 TitleInfo:
   UniqueId                : 0xFD970 # Cia Builder Example Unique ID, you need to set your own one
