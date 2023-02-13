@@ -24,7 +24,7 @@ std::string Keyboard::input()
   swkbdSetStatusData(&swkbd, &swkbdStatus, false, true);
   swkbdSetLearningData(&swkbd, &swkbdLearning, false, true);
   swkbdSetFeatures(&swkbd, SWKBD_DARKEN_TOP_SCREEN | SWKBD_ALLOW_HOME | SWKBD_ALLOW_RESET | SWKBD_ALLOW_POWER | SWKBD_PREDICTIVE_INPUT);
-  swkbdInputText(&swkbd, string, sizeof(string)); //Something went wrong
+  swkbdInputText(&swkbd, string, sizeof(string));
   std::string result(string);
   return result;
 }

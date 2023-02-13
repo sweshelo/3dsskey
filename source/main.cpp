@@ -52,7 +52,7 @@ static void printQr(const QrCode &qr, C3D_RenderTarget* screen) {
   C2D_TextParse(&gText[0], gTextBuf, "QRコードをスキャンしてログインしてください");
   C2D_TextParse(&gText[1], gTextBuf, "完了したらボタンを押して続行します");
 
-  for(int i=0; i<3; i++)
+  for(int i=0; i<2; i++)
     C2D_TextOptimize(&gText[i]);
 
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
@@ -69,7 +69,7 @@ static void printQr(const QrCode &qr, C3D_RenderTarget* screen) {
   }
 
   //Draw Info
-  for(int i=0; i<3; i++)
+  for(int i=0; i<2; i++)
     C2D_DrawText(&gText[i], C2D_AlignCenter, 200.0f, 180.0f + 12.0f * i, 0.5f, 0.5f, 0.5f);
 
   C3D_FrameEnd(0);
