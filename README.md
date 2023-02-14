@@ -14,3 +14,9 @@ Misskey client for Nintendo 3DS
 ```
 make
 ```
+
+## credit
+- jingle
+  * https://dova-s.jp/se/play1246.html
+- icons
+  * https://icons8.jp/icon/set/image/material-rounded

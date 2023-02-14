@@ -1,0 +1,6 @@
+--atlas -f rgba8888 -z auto
+global.png
+home.png
+direct.png
+show.png
+hide.png

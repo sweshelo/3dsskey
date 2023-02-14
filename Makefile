@@ -38,8 +38,8 @@ DATA		:=	data
 INCLUDES	:=	source/include
 GRAPHICS	:=	gfx
 GFXBUILD	:=	$(BUILD)
-#ROMFS		:=	romfs
-#GFXBUILD	:=	$(ROMFS)/gfx
+ROMFS		:=	$(BUILD)/romfs
+GFXBUILD	:=	$(ROMFS)/gfx
 
 APP_TITLE	=	3dsskey
 APP_DESCRIPTION	=	Misskey client for Nintendo 3DS
