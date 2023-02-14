@@ -15,6 +15,7 @@ size_t HTTP::buffer_writer(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 json HTTP::post(const std::string &url, const json &body) {
   std::string response, request = body.dump(0);
+  accessed = url;
   int res;
 
   void *socubuf = memalign(0x1000, 0x100000);
@@ -51,6 +52,7 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEDATA, &response);
 
   result = curl_easy_perform(CurlHandle);
+  curl_easy_getinfo(CurlHandle, CURLINFO_RESPONSE_CODE, &httpCode);
   curl_easy_cleanup(CurlHandle);
   CurlHandle = nullptr;
 

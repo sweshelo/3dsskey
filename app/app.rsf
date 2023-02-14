@@ -7,7 +7,7 @@ BasicInfo:
 
 RomFs:
   # Specifies the root path of the read only file system to include in the ROM.
-  RootPath                : #"source"
+  RootPath                : "romfs"
   
 TitleInfo:
   UniqueId                : 0xFD970 # Cia Builder Example Unique ID, you need to set your own one

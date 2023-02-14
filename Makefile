@@ -38,8 +38,8 @@ DATA		:=	data
 INCLUDES	:=	source/include
 GRAPHICS	:=	gfx
 GFXBUILD	:=	$(BUILD)
-#ROMFS		:=	romfs
-#GFXBUILD	:=	$(ROMFS)/gfx
+ROMFS		:=	$(BUILD)/romfs
+GFXBUILD	:=	$(ROMFS)/gfx
 
 APP_TITLE	=	3dsskey
 APP_DESCRIPTION	=	Misskey client for Nintendo 3DS
@@ -49,8 +49,8 @@ BANNER_AUDIO        :=	app/audio.wav
 BANNER_IMAGE        :=	app/banner.png
 RSF_PATH            :=	app/app.rsf
 VERSION_MAJOR       :=	0
-VERSION_MINOR       :=	0
-VERSION_BUILD       :=	1
+VERSION_MINOR       :=	1
+VERSION_BUILD       :=	0
 
 #---------------------------------------------------------------------------------
 # options for code generation
