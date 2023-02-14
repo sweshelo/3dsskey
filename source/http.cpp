@@ -51,6 +51,7 @@ json HTTP::post(const std::string &url, const json &body) {
   curl_easy_setopt(CurlHandle, CURLOPT_WRITEDATA, &response);
 
   result = curl_easy_perform(CurlHandle);
+  curl_easy_getinfo(CurlHandle, CURLINFO_RESPONSE_CODE, &httpCode);
   curl_easy_cleanup(CurlHandle);
   CurlHandle = nullptr;
 

@@ -12,7 +12,11 @@ int main(int argc, char **argv)
   consoleInit(GFX_BOTTOM, NULL);
 
   Misskey msky;
-  msky.login();
+  do{
+    msky.login();
+  }while(!msky.verifyToken());
+
+  msky.timeline();
 
   gfxExit();
   return 0;

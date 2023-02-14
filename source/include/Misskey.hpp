@@ -30,13 +30,14 @@ class Misskey{
   private:
     C3D_RenderTarget *top, *bottom;
     HTTP http;
-    nlohmann::json confjson;
+    nlohmann::json confjson, req, res;
     Keyboard kbd;
     std::ifstream conffile;
     std::string token = "";
+    std::string domain = "";
     void drawQRCode(std::string, int, int, int, int);
     void auth();
-    void verifyToken();
+    void createPost();
   public:
     Misskey();
 
@@ -48,6 +49,7 @@ class Misskey{
 
     // main
     void timeline();
+    bool verifyToken();
 };
 
 #endif
