@@ -49,8 +49,8 @@ BANNER_AUDIO        :=	app/audio.wav
 BANNER_IMAGE        :=	app/banner.png
 RSF_PATH            :=	app/app.rsf
 VERSION_MAJOR       :=	0
-VERSION_MINOR       :=	0
-VERSION_BUILD       :=	1
+VERSION_MINOR       :=	1
+VERSION_BUILD       :=	0
 
 #---------------------------------------------------------------------------------
 # options for code generation
