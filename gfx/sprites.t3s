@@ -1,6 +1,7 @@
 --atlas -f rgba8888 -z auto
-global.png
-home.png
-direct.png
-show.png
-hide.png
+icons/global.png
+icons/home.png
+icons/direct.png
+icons/show.png
+icons/hide.png
+ui/post.png

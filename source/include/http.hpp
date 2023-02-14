@@ -3,6 +3,7 @@
 
 #include <curl/curl.h>
 #include <malloc.h>
+#include <string>
 #include <3ds.h>
 #include "json.hpp"
 
@@ -20,6 +21,7 @@ class HTTP
   public:
     json post(const std::string&, const json&);
     long httpCode;
+    std::string accessed;
     CURLcode result;
 };
 

@@ -18,6 +18,7 @@
 #include "util.hpp"
 #include "qrcodegen.hpp"
 #include "Keyboard.hpp"
+#include "Sprite.hpp"
 
 const u32 SPRINGGREEN = C2D_Color32(0x00, 0xFF, 0x7F, 0xFF);
 const u32 GREENYELLOW = C2D_Color32(0xAD, 0xFF, 0x2F, 0xFF);
@@ -35,6 +36,8 @@ class Misskey{
     std::ifstream conffile;
     std::string token = "";
     std::string domain = "";
+    C2D_SpriteSheet spriteSheet;
+    Sprite spr[1];
     void drawQRCode(std::string, int, int, int, int);
     void auth();
     void createPost();

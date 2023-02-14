@@ -15,6 +15,7 @@ size_t HTTP::buffer_writer(char *ptr, size_t size, size_t nmemb, void *userdata)
 
 json HTTP::post(const std::string &url, const json &body) {
   std::string response, request = body.dump(0);
+  accessed = url;
   int res;
 
   void *socubuf = memalign(0x1000, 0x100000);

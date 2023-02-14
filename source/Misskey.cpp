@@ -1,5 +1,8 @@
 #include "Misskey.hpp"
 #include <iostream>
+#include <chrono>
+#include <iomanip>
+#include <sstream>
 
 Misskey::Misskey(){
   top = C3D_RenderTargetCreate(240, 400, GPU_RB_RGBA8, GPU_RB_DEPTH24_STENCIL8);
@@ -24,6 +27,10 @@ Misskey::Misskey(){
       "newskey.cc",
       "misskey.neos.love",
       });
+
+  spriteSheet = C2D_SpriteSheetLoad("romfs:/gfx/sprites.t3x");
+  if (!spriteSheet) svcBreak(USERBREAK_PANIC);
+  std::cout << C2D_SpriteSheetCount(spriteSheet) << std::endl;
 }
 
 void Misskey::drawQRCode(std::string url, int pixel, int border, int offsetX, int offsetY){
@@ -86,7 +93,7 @@ void Misskey::auth(){
   C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
   C2D_SceneBegin(top);
   C2D_TargetClear(top, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
-  C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SPRINGGREEN, GREENYELLOW, GREENYELLOW, SPRINGGREEN);
+  C2D_DrawRectangle(0, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SPRINGGREEN, GREENYELLOW, SPRINGGREEN, GREENYELLOW);
   std::string uuid = genUuid();
   std::string authUri = "https://" + domain + "/miauth/" + uuid + "?name=3dsskey&permission=write:notes";
   drawQRCode(authUri, 2, 2, 0, 0);
@@ -126,14 +133,60 @@ void Misskey::auth(){
 }
 
 void Misskey::timeline(){
+
+  kbd.setHintText("今どうしてる？");
+  std::cout << spriteSheet << std::endl;
+  spr[0].set(spriteSheet, 5);
+
+  char statusCodeBuf[128];
+  C2D_TextBuf gTextBuf = C2D_TextBufNew(4096);
+  C2D_Text gText[4];
+  C2D_TextParse(&gText[0], gTextBuf, "ボタンを押すとHOMEメニューにもどります");
+  C2D_TextParse(&gText[1], gTextBuf, "新規投稿");
+
+  bool reparse = true;
+
   while(aptMainLoop()){
+    //Draw
+    C3D_FrameBegin(C3D_FRAME_SYNCDRAW);
+    C2D_SceneBegin(bottom);
+    C2D_TargetClear(bottom, C2D_Color32(0x00, 0x00, 0x00, 0xFF));
+    C2D_DrawRectangle(0, 0, 0, 320, 240, SPRINGGREEN, SPRINGGREEN, GREENYELLOW, GREENYELLOW);
+    C2D_DrawText(&gText[0], C2D_AlignCenter | C2D_WithColor, 160.0f, 220.0f, 0.5f, 0.5f, 0.5f, C2D_Color32(0xA0, 0xA0, 0xA0, 0xFF));
+
+    //UI Sprite
+    spr[0].draw();
+
+    //Upscreen
+    C2D_SceneBegin(top);
+    C2D_TargetClear(top, C2D_Color32(0xF0, 0xF0, 0xF0, 0xFF));
+    if(reparse){
+      auto now = std::chrono::system_clock::now();
+      std::time_t time = std::chrono::system_clock::to_time_t(now);
+
+      // 時刻を文字列に変換
+      std::stringstream ss;
+      ss << std::put_time(std::localtime(&time), "%Y/%m/%d %H:%M:%S");
+      std::string time_str = ss.str();
+
+      snprintf(statusCodeBuf, 128, "HTTP > POST %s : %ld", http.accessed.c_str(), http.httpCode);
+      C2D_TextParse(&gText[2], gTextBuf, statusCodeBuf);
+      C2D_TextParse(&gText[3], gTextBuf, time_str.c_str());
+      reparse = false;
+    }
+    C2D_DrawText(&gText[2], 0, 8.0f,  8.0f, 0.5f, 0.5f, 0.5f);
+    C2D_DrawText(&gText[3], 0, 8.0f, 24.0f, 0.5f, 0.5f, 0.5f);
+
+    C3D_FrameEnd(0);
+
     hidScanInput();
     u32 kDown = hidKeysDown();
-    if(kDown & KEY_A){
-      break;
-    }
     if(kDown & KEY_X){
       this->createPost();
+      reparse = true;
+    }
+    if(kDown & KEY_START){
+      break;
     }
   }
 }
