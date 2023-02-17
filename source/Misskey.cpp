@@ -59,9 +59,10 @@ void Misskey::login(){
 }
 
 bool Misskey::verifyToken(){
-  res = http.post("https://" + domain + "/api/i", {{
+  http.post("https://" + domain + "/api/i", {{
       "i", token
   }});
+  res = http.parse();
   return (http.httpCode == 200);
 }
 
@@ -84,7 +85,10 @@ void Misskey::auth(){
     domain = kbd.input();
 
     //check domain
-    res = http.post("https://" + domain + "/api/meta", NULL);
+    if (http.post("https://" + domain + "/api/meta") > 0){
+      res = http.parse();
+      std::cout << res.dump(2) << std::endl << http.contentType << std::endl;
+    }
 
     guideString = "ドメイン名を正しく入力してください";
   }while(!(domain.length() > 0) || !http.httpCode);
@@ -114,7 +118,10 @@ void Misskey::auth(){
       break;
   }
 
-  res = http.post("https://" + domain + "/api/miauth/" + uuid + "/check", NULL);
+  if (http.post("https://" + domain + "/api/miauth/" + uuid + "/check") > 0){
+    res = http.parse();
+  };
+  std::cout << res.dump(2) << std::endl;
   if (http.httpCode==200 && res.contains("token")){
     token = res["token"];
     std::ofstream ofstr("sdmc:/3ds/3dsskey/config.json", std::ios::out | std::ios::binary | std::ios_base::trunc);
@@ -129,6 +136,12 @@ void Misskey::auth(){
     ofstr.write( confjson.dump(2).c_str(), confjson.dump(2).size() );
   }else{
     std::cout << "Something went wrong." << std::endl;
+    while(aptMainLoop()){
+      //HID
+      hidScanInput();
+      if(hidKeysDown() & KEY_A)
+        break;
+    }
   }
 }
 
@@ -197,5 +210,6 @@ void Misskey::createPost(){
     {"text", content},
     {"i", token}
   };
-  res = http.post("https://" + domain + "/api/notes/create", req);
+  http.post("https://" + domain + "/api/notes/create", req);
+  res = http.parse();
 }

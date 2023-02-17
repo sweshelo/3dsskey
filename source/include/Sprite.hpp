@@ -10,6 +10,7 @@ class Sprite{
     float px, py, pz, sx, sy, rx, ry;
   public:
     void set(C2D_SpriteSheet, int);
+    void set(C2D_Image);
     void pos(float, float, float);
     void draw(void);
 };
